@@ -474,11 +474,15 @@ class FlowCameraView : FrameLayout {
         try {
             mMediaPlayer?.stop()
             mMediaPlayer?.release()
+        } catch (e: Throwable){
+        } finally {
             mMediaPlayer = null
+        }
+        try {
             mMediaPlayer = MediaPlayer()
             mMediaPlayer?.setDataSource(context, uri)
             mMediaPlayer?.setSurface(Surface(mTextureView?.surfaceTexture))
-            mMediaPlayer?.isLooping = true
+            mMediaPlayer?.isLooping = false
             mMediaPlayer?.setOnPreparedListener { mp: MediaPlayer ->
                 mp.start()
                 val ratio = mp.videoWidth * 1f / mp.videoHeight
@@ -498,6 +502,11 @@ class FlowCameraView : FrameLayout {
      * 停止视频播放
      */
     private fun stopVideoPlay() {
+        try {
+            mMediaPlayer?.stop()
+            mMediaPlayer?.release()
+        }catch (e: Throwable){
+        }
         currentRecording?.stop()
         mTextureView?.visibility = View.GONE
     }
@@ -610,11 +619,23 @@ class FlowCameraView : FrameLayout {
                     Lifecycle.Event.ON_DESTROY -> {
                         displayManager.unregisterDisplayListener(displayListener)
                         cameraExecutor.shutdown()
+                        stopVideoPlay()
+                    }
+                    Lifecycle.Event.ON_PAUSE -> {
+                        pauseVideoPlay()
                     }
                     else -> {}
                 }
             }
         })
+    }
+
+    private fun pauseVideoPlay() {
+        try {
+            mMediaPlayer?.pause()
+
+        } catch (e: Throwable){
+        }
     }
 
     private suspend fun bindCameraUseCases() {
