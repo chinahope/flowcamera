@@ -645,7 +645,8 @@ class FlowCameraView : FrameLayout {
 
         // create the user required QualitySelector (video resolution): we know this is
         // supported, a valid qualitySelector will be created.
-        val quality = cameraCapabilities[cameraIndex].qualities[qualityIndex]
+//        val quality = cameraCapabilities[cameraIndex].qualities[qualityIndex]
+        val quality = Quality.HD
         val qualitySelector = QualitySelector.from(quality)
 //        val rotation = viewFinder.display?.rotation
 
