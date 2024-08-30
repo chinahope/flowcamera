@@ -749,7 +749,7 @@ class FlowCameraView : FrameLayout {
 
             val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 FileProvider.getUriForFile(context,
-                    "${context.packageName}.fileProvider",
+                    "com.hbzhou.open.flowcamera.fileProvider",
                     videoFile!!)
             } else {
                 Uri.fromFile(videoFile!!)
