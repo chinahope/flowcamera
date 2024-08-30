@@ -745,22 +745,29 @@ class FlowCameraView : FrameLayout {
         // 如果是删除视频文件  适配Android Q
         if (videoFile != null && videoFile?.exists() == true) {
 
-            val isDeleted: Boolean
+            var isDeleted: Boolean = false
+            try {
+                val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    FileProvider.getUriForFile(context,
+                        "com.hbzhou.open.flowcamera.fileProvider",
+                        videoFile!!)
+                } else {
+                    Uri.fromFile(videoFile!!)
+                }
 
-            val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                FileProvider.getUriForFile(context,
-                    "com.hbzhou.open.flowcamera.fileProvider",
-                    videoFile!!)
-            } else {
-                Uri.fromFile(videoFile!!)
-            }
+                isDeleted = if (Build.VERSION.SDK_INT < Q) {
+                    videoFile!!.delete()
+                } else {
+                    context.contentResolver.delete(uri,
+                        "${MediaStore.Video.Media.DATA} = ?",
+                        arrayOf(videoFile?.name)) > 0
+                }
+            } catch (e: Exception){
 
-            isDeleted = if (Build.VERSION.SDK_INT < Q) {
-                videoFile!!.delete()
-            } else {
-                context.contentResolver.delete(uri,
-                    "${MediaStore.Video.Media.DATA} = ?",
-                    arrayOf(videoFile?.name)) > 0
+            } finally {
+                if (videoFile!!.exists()) {
+                    isDeleted = videoFile!!.delete()
+                }
             }
 
             LogUtil.i("videoFile is deleted $isDeleted")
